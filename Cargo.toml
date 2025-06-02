@@ -1,0 +1,19 @@
+[package]
+name = "cmangos-api"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+cxx = "1.0"
+prost = "0.13.5"
+tokio = { version = "1.0", features = ["rt-multi-thread", "macros"] }
+tonic = "0.13.1"
+tower-http = { version = "0.6", features = ["cors"] }
+tonic-web = "0.13.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "time"] }
+tower = "0.5.2"
+
+[build-dependencies]
+cmake = "0.1"
+tonic-build = { version = "0.13", features = ["prost"] } 
+prost-build = "0.13"
