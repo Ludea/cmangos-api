@@ -1,60 +1,47 @@
-use tonic::{Request, Response, Status, service::LayerExt as _, transport::Server};
+use axum::{Router, extract::Path, routing::get};
+use std::{
+    net::SocketAddr,
+    sync::{Arc, Mutex},
+};
+use tower_http::trace::TraceLayer;
+use wow_mpq::Archive;
 
-use hello_world::greeter_server::{Greeter, GreeterServer};
-use hello_world::{HelloReply, HelloRequest};
-
-pub mod hello_world {
-    tonic::include_proto!("helloworld");
-}
-
-#[cxx::bridge]
+/*#[cxx::bridge]
 mod ffi {
     unsafe extern "C++" {
         include!("../mangos-classic/src/game/Accounts/AccountMgr.h");
         //type AccountMgr;
         fn CreateAccount();
     }
-}
-
-#[derive(Default)]
-pub struct MyGreeter {}
-
-#[tonic::async_trait]
-impl Greeter for MyGreeter {
-    async fn say_hello(
-        &self,
-        request: Request<HelloRequest>,
-    ) -> Result<Response<HelloReply>, Status> {
-        println!("Got a request from {:?}", request.remote_addr());
-        ffi::CreateAccount();
-        let reply = hello_world::HelloReply {
-            message: format!("Hello {}!", request.into_inner().name),
-        };
-        Ok(Response::new(reply))
-    }
-}
+}*/
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::fmt::init();
 
-    let addr = "127.0.0.1:3000".parse().unwrap();
+    let archive = Arc::new(Mutex::new(Archive::open("patch.mpq")?));
+    let archive_clone = archive.clone();
+    let routes = Router::new().nest_service(
+        "/assets/{path}",
+        get(move |path| {
+            let archive = archive_clone;
+            get_wow_data(path, archive)
+        }),
+    );
 
-    let greeter = MyGreeter::default();
-    let greeter = tower::ServiceBuilder::new()
-        .layer(tower_http::cors::CorsLayer::new())
-        .layer(tonic_web::GrpcWebLayer::new())
-        .into_inner()
-        .named_layer(GreeterServer::new(greeter));
+    let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
+    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
 
-    println!("GreeterServer listening on {addr}");
+    tracing::info!("listening on {}", listener.local_addr().unwrap());
 
-    Server::builder()
-        // GrpcWeb is over http1 so we must enable it.
-        .accept_http1(true)
-        .add_service(greeter)
-        .serve(addr)
-        .await?;
+    axum::serve(listener, routes.layer(TraceLayer::new_for_http()))
+        .await
+        .unwrap();
 
     Ok(())
+}
+
+async fn get_wow_data(Path(path): Path<String>, mpq: Arc<Mutex<Archive>>) -> String {
+    let mut mpq = mpq.lock().unwrap();
+    String::from_utf8(mpq.read_file(&path).unwrap()).unwrap()
 }
