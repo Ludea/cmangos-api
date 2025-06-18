@@ -1773,7 +1773,8 @@ dependencies = [
 [[package]]
 name = "wow-mpq"
 version = "0.1.0"
-source = "git+https://github.com/wowemulation-dev/warcraft-rs#fe60e537cc0db344868ef6153e8f0be679ae1550"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b768c62edb8e37d7e9e167fad2b8ce70aac515b23f28f5d3f65d1d1a9172161d"
 dependencies = [
  "adler",
  "bytes",
