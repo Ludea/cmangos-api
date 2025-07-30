@@ -10,7 +10,7 @@ tokio = { version = "1.0", features = ["rt-multi-thread", "macros"] }
 tower-http = { version = "0.6.6", features = ["trace", "cors"] }
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "time"] }
-wow-mpq = "0.1"
+wow-mpq = "0.2"
 
 [build-dependencies]
 cxx-build = "1.0"
