@@ -1,0 +1,3 @@
+[submodule "src/mangos-classic"]
+	path = src/mangos-classic
+	url = https://github.com/cmangos/mangos-classic.git
