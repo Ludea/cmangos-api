@@ -1,3 +1,4 @@
 /target
 Data
 src/mangos-classic
+Cargo.lock

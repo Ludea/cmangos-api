@@ -4,13 +4,13 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-axum = "0.8.4"
-cxx = "1.0"
+axum = "0.8"
+cxx = "1"
 tokio = { version = "1.0", features = ["rt-multi-thread", "macros"] }
 tower-http = { version = "0.6.6", features = ["trace", "cors"] }
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "time"] }
-wow-mpq = "0.1.0"
+wow-mpq = "0.1"
 
 [build-dependencies]
 cxx-build = "1.0"
