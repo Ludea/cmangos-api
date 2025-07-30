@@ -17,14 +17,13 @@ use tower_http::{
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use wow_mpq::PatchChain;
 
-/*#[cxx::bridge]
+#[cxx::bridge]
 mod ffi {
     unsafe extern "C++" {
-        include!("../mangos-classic/src/game/Accounts/AccountMgr.h");
-        //type AccountMgr;
-        fn CreateAccount();
+        include!("mangos-classic/src/mangosd/Master.h");
+        fn start_cmangos_server() -> i32;
     }
-}*/
+}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -42,6 +41,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .with_file(false),
         )
         .init();
+
+    ffi::start_cmangos_server();
 
     let mut chain = PatchChain::new();
     match fs::read_dir("Data") {
